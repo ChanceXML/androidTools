@@ -17,10 +17,6 @@ import sys.io.Process;
  */
 class Tools
 {
-	/**
-	 * Enables app security, restricting access to sensitive data.
-	 * This method may require specific permissions or system-level access.
-	 */
 	public static inline function enableAppSecure():Void
 	{
 		final enableAppSecureJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'enableAppSecure', '()V');
@@ -29,10 +25,6 @@ class Tools
 			enableAppSecureJNI();
 	}
 
-	/**
-	 * Disables app security, allowing access to sensitive data.
-	 * This method may require specific permissions or system-level access.
-	 */
 	public static inline function disableAppSecure():Void
 	{
 		final disableAppSecureJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'disableAppSecure', '()V');
@@ -41,12 +33,6 @@ class Tools
 			disableAppSecureJNI();
 	}
 
-	/**
-	 * Launches another package (app) by its package name.
-	 *
-	 * @param packageName The package name of the app to launch.
-	 * @param requestCode The request code to use when launching the app (default is 1).
-	 */
 	public static inline function launchPackage(packageName:String, requestCode:Int = 1):Void
 	{
 		final launchPackageJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'launchPackage', '(Ljava/lang/String;I)V');
@@ -57,16 +43,12 @@ class Tools
 
 	/**
 	 * Shows an alert dialog with optional positive and negative buttons.
-	 *
-	 * @param title The title of the dialog.
-	 * @param message The message to display in the dialog.
-	 * @param positiveButton Optional positive button data with name and callback function.
-	 * @param negativeButton Optional negative button data with name and callback function.
 	 */
 	public static function showAlertDialog(title:String, message:String, ?positiveButton:ButtonData, ?negativeButton:ButtonData):Void
 	{
+		// Default to an "OK" button if no button data is provided
 		if (positiveButton == null)
-			positiveButton = {name: null, func: null};
+			positiveButton = {name: "OK", func: null};
 
 		if (negativeButton == null)
 			negativeButton = {name: null, func: null};
@@ -80,41 +62,20 @@ class Tools
 	}
 
 	#if sys
-	/**
-	 * Checks if the device is rooted.
-	 *
-	 * @return true if the device is rooted, false otherwise.
-	 */
 	public static function isRooted():Bool
 	{
 		final process:Process = new Process('su');
-
 		final exitCode:Null<Int> = process.exitCode(true);
-
 		return exitCode != null && exitCode != 255;
 	}
 	#end
 
-	/**
-	 * Checks if the device supports Dolby Atmos audio.
-	 *
-	 * @return true if Dolby Atmos is supported, false otherwise.
-	 */
 	public static inline function isDolbyAtmos():Bool
 	{
 		final isDolbyAtmosJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'isDolbyAtmos', '()Z');
 		return isDolbyAtmosJNI != null && isDolbyAtmosJNI();
 	}
 
-	/**
-	 * Shows a notification on the device.
-	 *
-	 * @param title The title of the notification.
-	 * @param message The message of the notification.
-	 * @param channelID Optional channel ID for the notification.
-	 * @param channelName Optional name for the notification channel.
-	 * @param ID Optional ID for the notification (default is 1).
-	 */
 	public static inline function showNotification(title:String, message:String, ?channelID:String = 'unknown_channel',
 			?channelName:String = 'Unknown Channel', ?ID:Int = 1):Void
 	{
@@ -124,92 +85,51 @@ class Tools
 			showNotificationJNI(title, message, channelID, channelName, ID);
 	}
 
-	/**
-	 * Sets the title of the current activity.
-	 *
-	 * @param title The new title to set for the activity.
-	 * @return true if the title was successfully set, false otherwise.
-	 */
 	public static inline function setActivityTitle(title:String):Bool
 	{
 		final setActivityTitleJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'setActivityTitle', '(Ljava/lang/String;)Z');
-
 		return setActivityTitleJNI != null && setActivityTitleJNI(title);
 	}
 
-	/**
-	 * Minimizes the current window (if possible).
-	 */
 	public static inline function minimizeWindow():Void
 	{
 		final minimizeWindowJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'minimizeWindow', '()V');
-
 		if (minimizeWindowJNI != null)
 			minimizeWindowJNI();
 	}
 
-	/**
-	 * Checks if the device is an Android TV.
-	 *
-	 * @return true if the device is an Android TV, false otherwise.
-	 */
 	public static inline function isAndroidTV():Bool
 	{
 		final isAndroidTVJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isAndroidTV', '()Z');
-
 		return isAndroidTVJNI != null && isAndroidTVJNI();
 	}
 
-	/**
-	 * Checks if the device is a tablet.
-	 *
-	 * @return true if the device is a tablet, false otherwise.
-	 */
 	public static inline function isTablet():Bool
 	{
 		final isTabletJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isTablet', '()Z');
-
 		return isTabletJNI != null && isTabletJNI();
 	}
 
-	/**
-	 * Checks if the device is a Chromebook.
-	 *
-	 * @return true if the device is a Chromebook, false otherwise.
-	 */
 	public static inline function isChromebook():Bool
 	{
 		final isChromebookJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isChromebook', '()Z');
-
 		return isChromebookJNI != null && isChromebookJNI();
 	}
 
-	/**
-	 * Checks if the device is in Samsung DeX mode.
-	 *
-	 * @return true if the device is in DeX mode, false otherwise.
-	 */
 	public static inline function isDeXMode():Bool
 	{
 		final isDeXModeJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isDeXMode', '()Z');
-
 		return isDeXModeJNI != null && isDeXModeJNI();
 	}
 }
 
-/**
- * Represents button data for use in alert dialogs.
- */
 @:noCompletion
-private typedef ButtonData =
+typedef ButtonData =
 {
 	name:String,
 	func:Void->Void
 }
 
-/**
- * Listener class for handling button click events in alert dialogs.
- */
 @:noCompletion
 private class ButtonListener #if (lime >= "8.0.0") implements JNISafety #end
 {
