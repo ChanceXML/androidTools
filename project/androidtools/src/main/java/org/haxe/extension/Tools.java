@@ -23,9 +23,6 @@ import android.view.DisplayCutout;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.content.FileProvider;
 import java.io.File;
@@ -37,53 +34,17 @@ import org.haxe.lime.HaxeObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/*
-	You can use the Android Extension class in order to hook
-	into the Android activity lifecycle. This is not required
-	for standard Java code, this is designed for when you need
-	deeper integration.
-
-	You can access additional references from the Extension class,
-	depending on your needs:
-
-	- Extension.assetManager (android.content.res.AssetManager)
-	- Extension.callbackHandler (android.os.Handler)
-	- Extension.mainActivity (android.app.Activity)
-	- Extension.mainContext (android.content.Context)
-	- Extension.mainView (android.view.View)
-
-	You can also make references to static or instance methods
-	and properties on Java classes. These classes can be included
-	as single files using <java path="to/File.java" /> within your
-	project, or use the full Android Library Project format (such
-	as this example) in order to include your own AndroidManifest
-	data, additional dependencies, etc.
-
-	These are also optional, though this example shows a static
-	function for performing a single task, like returning a value
-	back to Haxe from Java.
-*/
 public class Tools extends Extension
 {
 	public static final String LOG_TAG = "Tools";
 
 	public static HaxeObject cbObject;
 
-	/**
-	 * Initializes the callback object for handling Haxe callbacks.
-	 *
-	 * @param cbObject The HaxeObject instance to handle callbacks.
-	 */
 	public static void initCallBack(final HaxeObject cbObject)
 	{
 		Tools.cbObject = cbObject;
 	}
 
-	/**
-	 * Retrieves the list of permissions that have been granted to the application.
-	 *
-	 * @return An array of strings representing granted permissions.
-	 */
 	public static String[] getGrantedPermissions()
 	{
 		List<String> granted = new ArrayList<String>();
@@ -106,15 +67,6 @@ public class Tools extends Extension
 		return granted.toArray(new String[granted.size()]);
 	}
 
-	/**
-	 * Displays a toast message on the screen.
-	 *
-	 * @param message The message to display.
-	 * @param duration The duration of the toast message.
-	 * @param gravity The gravity of the toast message.
-	 * @param xOffset The horizontal offset from the gravity point.
-	 * @param yOffset The vertical offset from the gravity point.
-	 */
 	public static void makeToastText(final String message, final int duration, final int gravity, final int xOffset, final int yOffset)
 	{
 		mainActivity.runOnUiThread(new Runnable()
@@ -139,16 +91,6 @@ public class Tools extends Extension
 		});
 	}
 
-	/**
-	 * Shows an alert dialog with optional positive and negative buttons.
-	 *
-	 * @param title The title of the alert dialog (optional).
-	 * @param message The message to display in the alert dialog.
-	 * @param positiveLabel The label for the positive button (optional).
-	 * @param positiveObject The HaxeObject to call when the positive button is clicked (optional).
-	 * @param negativeLabel The label for the negative button (optional).
-	 * @param negativeObject The HaxeObject to call when the negative button is clicked (optional).
-	 */
 	public static void showAlertDialog(final String title, final String message, final String positiveLabel, final HaxeObject positiveObject, final String negativeLabel, final HaxeObject negativeObject)
 	{
 		final Object lock = new Object();
@@ -160,22 +102,21 @@ public class Tools extends Extension
 			{
 				try
 				{
-					final AlertDialog.Builder builder = new AlertDialog.Builder(mainContext, android.R.style.Theme_Material_Dialog_Alert);
+					final AlertDialog.Builder builder;
+
+					if (Build.VERSION.SDK_INT >= 21) {
+						builder = new AlertDialog.Builder(mainContext, android.R.style.Theme_DeviceDefault_Dialog_Alert);
+					} else {
+						builder = new AlertDialog.Builder(mainContext);
+					}
 
 					if (title != null)
 						builder.setTitle(title);
 
+					if (message != null)
+						builder.setMessage(message);
+
 					builder.setCancelable(false);
-
-					TextView messageView = new TextView(mainContext);
-					messageView.setPadding(20, 20, 20, 20);
-					messageView.setText(message);
-
-					ScrollView scrollView = new ScrollView(mainContext);
-					scrollView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 300));
-					scrollView.addView(messageView);
-
-					builder.setView(scrollView);
 
 					if (positiveLabel != null)
 					{
@@ -241,9 +182,6 @@ public class Tools extends Extension
 		}
 	}
 
-	/**
-	 * Enables secure mode for the application window.
-	 */
 	public static void enableAppSecure()
 	{
 		mainActivity.runOnUiThread(new Runnable()
@@ -263,9 +201,6 @@ public class Tools extends Extension
 		});
 	}
 
-	/**
-	 * Disables secure mode for the application window.
-	 */
 	public static void disableAppSecure()
 	{
 		mainActivity.runOnUiThread(new Runnable()
@@ -285,12 +220,6 @@ public class Tools extends Extension
 		});
 	}
 
-	/**
-	 * Launches an application package by its package name.
-	 *
-	 * @param packageName The package name of the application to launch.
-	 * @param requestCode The request code to identify the request.
-	 */
 	public static void launchPackage(final String packageName, final int requestCode)
 	{
 		try
@@ -303,12 +232,6 @@ public class Tools extends Extension
 		}
 	}
 
-	/**
-	 * Requests permissions from the user if they are not granted.
-	 *
-	 * @param permissions An array of permission strings to request.
-	 * @param requestCode The request code to identify the request.
-	 */
 	public static void requestPermissions(String[] permissions, int requestCode)
 	{
 		List<String> ungrantedPermissions = new ArrayList<>();
@@ -330,12 +253,6 @@ public class Tools extends Extension
 		}
 	}
 
-	/**
-	 * Requests a specific system setting.
-	 *
-	 * @param setting The setting to request.
-	 * @param requestCode The request code to identify the request.
-	 */
 	public static void requestSetting(final String setting, final int requestCode)
 	{
 		try
@@ -350,11 +267,6 @@ public class Tools extends Extension
 		}
 	}
 
-	/**
-	 * Checks whether Dolby Atmos is supported on the device.
-	 *
-	 * @return true if Dolby Atmos is supported, false otherwise.
-	 */
 	public static boolean isDolbyAtmos()
 	{
 		try
@@ -378,15 +290,6 @@ public class Tools extends Extension
 		return false;
 	}
 
-	/**
-	 * Shows a notification on the device.
-	 *
-	 * @param title The title of the notification.
-	 * @param message The message text of the notification.
-	 * @param channelID The ID of the notification channel.
-	 * @param channelName The name of the notification channel.
-	 * @param ID The ID of the notification.
-	 */
 	@SuppressWarnings("deprecation")
 	public static void showNotification(final String title, final String message, final String channelID, final String channelName, final int ID)
 	{
@@ -424,115 +327,56 @@ public class Tools extends Extension
 		});
 	}
 
-	/**
-	 * Retrieves the application's private files directory.
-	 *
-	 * @return A File object representing the application's private files directory.
-	 */
 	public static File getFilesDir()
 	{
 		return mainContext.getFilesDir();
 	}
 
-	/**
-	 * Retrieves the primary external storage directory for an application.
-	 *
-	 * @param type The type of files directory to return. May be null for the primary files directory.
-	 * @return A File object representing the primary external storage directory for the application.
-	 */
 	public static File getExternalFilesDir(final String type)
 	{
 		return mainContext.getExternalFilesDir(type);
 	}
 
-	/**
-	 * Retrieves absolute paths to application-specific directories on all shared/external storage devices.
-	 *
-	 * @param type The type of files directory to return. May be null for the primary files directory.
-	 * @return An array of File objects representing the absolute paths to application-specific directories on all shared/external storage devices.
-	 */
 	public static File[] getExternalFilesDirs(final String type)
 	{
 		return mainContext.getExternalFilesDirs(type);
 	}
 
-	/**
-	 * Retrieves the application's cache directory.
-	 *
-	 * @return A File object representing the application's cache directory.
-	 */
 	public static File getCacheDir()
 	{
 		return mainContext.getCacheDir();
 	}
 
-	/**
-	 * Retrieves the primary external storage directory for the application's cache files.
-	 *
-	 * @return A File object representing the primary external storage directory for the application's cache files.
-	 */
 	public static File getExternalCacheDir()
 	{
 		return mainContext.getExternalCacheDir();
 	}
 
-	/**
-	 * Retrieves absolute paths to application-specific cache directories on all shared/external storage devices.
-	 *
-	 * @return An array of File objects representing the absolute paths to application-specific cache directories on all shared/external storage devices.
-	 */
 	public static File[] getExternalCacheDirs()
 	{
 		return mainContext.getExternalCacheDirs();
 	}
 
-	/**
-	 * Retrieves the application's code cache directory.
-	 *
-	 * @return A File object representing the application's code cache directory.
-	 */
 	public static File getCodeCacheDir()
 	{
 		return mainContext.getCodeCacheDir();
 	}
 
-	/**
-	 * Retrieves the application's directory for storing files that should not be backed up to the cloud.
-	 *
-	 * @return A File object representing the application's directory for storing files that should not be backed up to the cloud.
-	 */
 	public static File getNoBackupFilesDir()
 	{
 		return mainContext.getNoBackupFilesDir();
 	}
 
-	/**
-	 * Retrieves the application's OBB (Opaque Binary Blob) directory.
-	 *
-	 * @return A File object representing the application's OBB directory.
-	 */
 	public static File getObbDir()
 	{
 		return mainContext.getObbDir();
 	}
 
-	/**
-	 * Retrieves absolute paths to application-specific OBB directories on all shared/external storage devices.
-	 *
-	 * @return An array of File objects representing the absolute paths to application-specific OBB directories on all shared/external storage devices.
-	 */
 	public static File[] getObbDirs()
 	{
 		return mainContext.getObbDirs();
 	}
 
-	/**
-	 * Adjusts the volume of a specified audio stream.
-	 *
-	 * @param streamType The type of audio stream to adjust (e.g., AudioManager.STREAM_MUSIC).
-	 * @param direction The direction to adjust the volume (e.g., AudioManager.ADJUST_RAISE, AudioManager.ADJUST_LOWER).
-	 * @param flags Additional operation flags (e.g., AudioManager.FLAG_SHOW_UI).
-	 */
 	public static void adjustStreamVolume(final int streamType, final int direction, final int flags)
 	{
 		try
@@ -547,12 +391,6 @@ public class Tools extends Extension
 		}
 	}
 
-	/**
-	 * Retrieves the current volume index for a specified audio stream.
-	 *
-	 * @param streamType The type of audio stream (e.g., AudioManager.STREAM_MUSIC).
-	 * @return The current volume index for the specified stream, or 0 if an error occurs.
-	 */
 	public static int getStreamVolume(final int streamType)
 	{
 		try
@@ -569,14 +407,6 @@ public class Tools extends Extension
 		return 0;
 	}
 
-	/**
-	 * Requests audio focus for a given stream and duration, and sets up a callback for focus changes.
-	 *
-	 * @param haxeCallbackObject The HaxeObject to receive audio focus change callbacks.
-	 * @param streamType The type of audio stream for which focus is requested.
-	 * @param durationHint The duration of the audio focus request (e.g., AudioManager.AUDIOFOCUS_GAIN).
-	 * @return The result of the audio focus request (e.g., AudioManager.AUDIOFOCUS_REQUEST_GRANTED or AUDIOFOCUS_REQUEST_FAILED).
-	 */
 	@SuppressWarnings("deprecation")
 	public static int requestAudioFocus(final HaxeObject haxeCallbackObject, final int streamType, final int durationHint)
 	{
@@ -604,12 +434,6 @@ public class Tools extends Extension
 		return AudioManager.AUDIOFOCUS_REQUEST_FAILED;
 	}
 
-	/**
-	 * Abandons audio focus for the given HaxeObject callback.
-	 *
-	 * @param haxeCallbackObject The HaxeObject that was used to request audio focus.
-	 * @return The result of the abandon audio focus request (e.g., AudioManager.AUDIOFOCUS_REQUEST_GRANTED or AUDIOFOCUS_REQUEST_FAILED).
-	 */
 	@SuppressWarnings("deprecation")
 	public static int abandonAudioFocus(final HaxeObject haxeCallbackObject)
 	{
