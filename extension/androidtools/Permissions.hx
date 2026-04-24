@@ -7,25 +7,21 @@ import extension.androidtools.jni.JNICache;
 
 using StringTools;
 
+/**
+ * Utility class for handling Android permissions via JNI.
+ */
 class Permissions
 {
+	public static inline var READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
+	public static inline var WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
+	public static inline var CAMERA = "android.permission.CAMERA";
+	public static inline var MANAGE_EXTERNAL_STORAGE = "android.permission.MANAGE_EXTERNAL_STORAGE";
+
 	public static inline function getGrantedPermissions():Array<String>
 	{
 		final getGrantedPermissionsJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'getGrantedPermissions', '()[Ljava/lang/String;');
 
 		return getGrantedPermissionsJNI != null ? getGrantedPermissionsJNI() : [];
-	}
-
-	public static inline function hasPermission(permission:String):Bool
-	{
-		final hasPermissionJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'hasPermission', '(Ljava/lang/String;)Z');
-		
-		if (hasPermissionJNI != null)
-		{
-			var p = permission.startsWith('android.permission.') ? permission : 'android.permission.$permission';
-			return hasPermissionJNI(p);
-		}
-		return false;
 	}
 
 	public static inline function requestPermissions(permissions:Array<String>, requestCode:Int = 1):Void
@@ -38,52 +34,27 @@ class Permissions
 
 			for (i in 0...permissions.length)
 			{
-				nativePermissions[i] = permissions[i].startsWith('android.permission.') 
-					? permissions[i] 
-					: 'android.permission.${permissions[i]}';
+				if (!permissions[i].startsWith('android.permission.'))
+					nativePermissions[i] = 'android.permission.${permissions[i]}';
+				else
+					nativePermissions[i] = permissions[i];
 			}
 
 			requestPermissionsJNI(nativePermissions, requestCode);
 		}
 	}
 
-	public static inline function hasManageAllFilesPermission():Bool
+	public static inline function hasManageAllFiles():Bool
 	{
-		final isExternalStorageManagerJNI:Null<Dynamic> = JNICache.createStaticMethod('android/os/Environment', 'isExternalStorageManager', '()Z');
-		
-		if (isExternalStorageManagerJNI != null) {
-			try {
-				return isExternalStorageManagerJNI();
-			} catch (e:Dynamic) {
-				return false;
-			}
-		}
-		return hasPermission('WRITE_EXTERNAL_STORAGE');
+		final hasManageAllFilesJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'hasManageAllFiles', '()Z');
+		return hasManageAllFilesJNI != null ? hasManageAllFilesJNI() : false;
 	}
-
-	public static inline function requestManageAllFilesPermission():Void
+	
+	public static inline function requestManageAllFiles():Void
 	{
-		final requestManageFilesJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestManageAllFilesPermission', '()V');
-		
-		if (requestManageFilesJNI != null)
-		{
-			requestManageFilesJNI();
-		}
-	}
-
-	public static inline function canDrawOverlays():Bool
-	{
-		final canDrawOverlaysJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'canDrawOverlays', '()Z');
-		return canDrawOverlaysJNI != null ? canDrawOverlaysJNI() : false;
-	}
-
-	public static inline function requestOverlayPermission():Void
-	{
-		final requestOverlayJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestOverlayPermission', '()V');
-		
-		if (requestOverlayJNI != null)
-		{
-			requestOverlayJNI();
+		final requestManageAllFilesJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestManageAllFiles', '()V');
+		if (requestManageAllFilesJNI != null) {
+			requestManageAllFilesJNI();
 		}
 	}
 }
