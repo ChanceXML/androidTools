@@ -16,6 +16,8 @@ import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.util.DisplayMetrics;
@@ -242,10 +244,58 @@ public class Tools extends Extension
 			{
 				if (Extension.mainActivity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
 					ungrantedPermissions.add(permission);
-				}
+			}
 
 			if (!ungrantedPermissions.isEmpty())
 				Extension.mainActivity.requestPermissions(ungrantedPermissions.toArray(new String[0]), requestCode);
+		}
+		catch (Exception e)
+		{
+			Log.e(LOG_TAG, e.toString());
+		}
+	}
+
+	public static boolean hasManageAllFiles()
+	{
+		try
+		{
+			if (Build.VERSION.SDK_INT >= 30)
+			{
+				return Environment.isExternalStorageManager();
+			}
+		}
+		catch (Exception e)
+		{
+			Log.e(LOG_TAG, e.toString());
+		}
+		return true; 
+	}
+
+	public static void requestManageAllFiles()
+	{
+		try
+		{
+			if (Build.VERSION.SDK_INT >= 30) 
+			{
+				try 
+				{
+					Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+					intent.addCategory("android.intent.category.DEFAULT");
+					intent.setData(Uri.parse(String.format("package:%s", Extension.mainContext.getPackageName())));
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					Extension.mainActivity.startActivity(intent);
+				} 
+				catch (Exception e) 
+				{
+					Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					Extension.mainActivity.startActivity(intent);
+				}
+			}
+			else
+			{
+				Log.w(LOG_TAG, "requestManageAllFiles is only applicable for Android 11+");
+			}
 		}
 		catch (Exception e)
 		{
