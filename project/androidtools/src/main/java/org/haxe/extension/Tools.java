@@ -47,6 +47,11 @@ public class Tools extends Extension
 		Tools.cbObject = cbObject;
 	}
 
+	public static String getPackageName()
+	{
+		return mainContext.getPackageName();
+	}
+
 	public static String[] getGrantedPermissions()
 	{
 		List<String> granted = new ArrayList<String>();
