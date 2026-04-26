@@ -7,10 +7,22 @@ import extension.androidtools.jni.JNICache;
 import extension.androidtools.jni.JNIUtil;
 
 /**
- * This class provides access to directories associated with the application context using JNI calls.
+ * This class provides access to directories and information associated with the application context using JNI calls.
  */
 class Context
 {
+	/**
+	 * Retrieves the name of this application's package.
+	 *
+	 * @return The application's package name.
+	 */
+	public static function getPackageName():String
+	{
+		final getPackageNameJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getPackageName', '()Ljava/lang/String;');
+
+		return getPackageNameJNI != null ? cast(getPackageNameJNI(), String) : '';
+	}
+
 	/**
 	 * Retrieves the absolute path of the directory assigned to the application for storing private files.
 	 *
