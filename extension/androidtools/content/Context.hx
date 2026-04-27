@@ -100,6 +100,37 @@ class Context
 	}
 
 	/**
+	 * Retrieves the absolute paths of directories assigned to the application for storing media files.
+	 * This bypasses scoped storage restrictions for the app's designated media folder.
+	 *
+	 * @return An array of absolute paths of the external media directories.
+	 */
+	public static function getExternalMediaDirs():Array<String>
+	{
+		final getExternalMediaDirsJNI:Null<Dynamic> = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getExternalMediaDirs', '()[Ljava/io/File;');
+
+		final dirs:Array<String> = [];
+		
+		if (getExternalMediaDirsJNI != null)
+		{
+			final result:Dynamic = getExternalMediaDirsJNI();
+			if (result != null)
+			{
+				final arr:Array<Dynamic> = cast(result, Array<Dynamic>);
+				if (arr != null)
+				{
+					for (dir in arr)
+					{
+						if (dir != null) dirs.push(JNIUtil.getAbsolutePath(dir));
+					}
+				}
+			}
+		}
+		
+		return dirs;
+	}
+
+	/**
 	 * Retrieves the absolute path of the directory assigned to the application for storing cached files.
 	 *
 	 * @return The absolute path of the cache directory.
