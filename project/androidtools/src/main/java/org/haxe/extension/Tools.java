@@ -396,7 +396,7 @@ public class Tools extends Extension
 
 	public static File getFilesDir()
 	{
-		return mainContext.getFilesDir();
+	    return mainContext.getFilesDir();
 	}
 
 	public static File getExternalFilesDir(final String type)
@@ -407,6 +407,12 @@ public class Tools extends Extension
 	public static File[] getExternalFilesDirs(final String type)
 	{
 		return mainContext.getExternalFilesDirs(type);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static File[] getExternalMediaDirs()
+	{
+		return mainContext.getExternalMediaDirs();
 	}
 
 	public static File getCacheDir()
