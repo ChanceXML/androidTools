@@ -19,8 +19,14 @@ class Context
 	public static function getPackageName():String
 	{
 		final getPackageNameJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getPackageName', '()Ljava/lang/String;');
-
-		return getPackageNameJNI != null ? cast(getPackageNameJNI(), String) : '';
+		
+		if (getPackageNameJNI != null)
+		{
+			final result:Dynamic = getPackageNameJNI();
+			if (result != null) return cast(result, String);
+		}
+		
+		return '';
 	}
 
 	/**
@@ -31,8 +37,14 @@ class Context
 	public static function getFilesDir():String
 	{
 		final getFilesDirJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getFilesDir', '()Ljava/io/File;');
-
-		return getFilesDirJNI != null ? JNIUtil.getAbsolutePath(getFilesDirJNI()) : '';
+		
+		if (getFilesDirJNI != null)
+		{
+			final result:Dynamic = getFilesDirJNI();
+			if (result != null) return JNIUtil.getAbsolutePath(result);
+		}
+		
+		return '';
 	}
 
 	/**
@@ -44,8 +56,14 @@ class Context
 	public static function getExternalFilesDir(type:String = null):String
 	{
 		final getExternalFilesDirJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getExternalFilesDir', '(Ljava/lang/String;)Ljava/io/File;');
-
-		return getExternalFilesDirJNI != null ? JNIUtil.getAbsolutePath(getExternalFilesDirJNI(type)) : '';
+		
+		if (getExternalFilesDirJNI != null)
+		{
+			final result:Dynamic = getExternalFilesDirJNI(type);
+			if (result != null) return JNIUtil.getAbsolutePath(result);
+		}
+		
+		return '';
 	}
 
 	/**
@@ -60,17 +78,25 @@ class Context
 		final getExternalFilesDirsJNI:Null<Dynamic> = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getExternalFilesDirs',
 			'(Ljava/lang/String;)[Ljava/io/File;');
 
+		final dirs:Array<String> = [];
+		
 		if (getExternalFilesDirsJNI != null)
 		{
-			final dirs:Array<String> = [];
-
-			for (dir in cast(getExternalFilesDirsJNI(type), Array<Dynamic>))
-				dirs.push(JNIUtil.getAbsolutePath(dir));
-
-			return dirs;
+			final result:Dynamic = getExternalFilesDirsJNI(type);
+			if (result != null)
+			{
+				final arr:Array<Dynamic> = cast(result, Array<Dynamic>);
+				if (arr != null)
+				{
+					for (dir in arr)
+					{
+						if (dir != null) dirs.push(JNIUtil.getAbsolutePath(dir));
+					}
+				}
+			}
 		}
-
-		return [];
+		
+		return dirs;
 	}
 
 	/**
@@ -81,8 +107,14 @@ class Context
 	public static function getCacheDir():String
 	{
 		final getCacheDirJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getCacheDir', '()Ljava/io/File;');
-
-		return getCacheDirJNI != null ? JNIUtil.getAbsolutePath(getCacheDirJNI()) : '';
+		
+		if (getCacheDirJNI != null)
+		{
+			final result:Dynamic = getCacheDirJNI();
+			if (result != null) return JNIUtil.getAbsolutePath(result);
+		}
+		
+		return '';
 	}
 
 	/**
@@ -93,8 +125,14 @@ class Context
 	public static function getCodeCacheDir():String
 	{
 		final getCodeCacheDirJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getCodeCacheDir', '()Ljava/io/File;');
-
-		return getCodeCacheDirJNI != null ? JNIUtil.getAbsolutePath(getCodeCacheDirJNI()) : '';
+		
+		if (getCodeCacheDirJNI != null)
+		{
+			final result:Dynamic = getCodeCacheDirJNI();
+			if (result != null) return JNIUtil.getAbsolutePath(result);
+		}
+		
+		return '';
 	}
 
 	/**
@@ -105,8 +143,14 @@ class Context
 	public static function getNoBackupFilesDir():String
 	{
 		final getNoBackupFilesDirJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getNoBackupFilesDir', '()Ljava/io/File;');
-
-		return getNoBackupFilesDirJNI != null ? JNIUtil.getAbsolutePath(getNoBackupFilesDirJNI()) : '';
+		
+		if (getNoBackupFilesDirJNI != null)
+		{
+			final result:Dynamic = getNoBackupFilesDirJNI();
+			if (result != null) return JNIUtil.getAbsolutePath(result);
+		}
+		
+		return '';
 	}
 
 	/**
@@ -117,8 +161,14 @@ class Context
 	public static function getExternalCacheDir():String
 	{
 		final getExternalCacheDirJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getExternalCacheDir', '()Ljava/io/File;');
-
-		return getExternalCacheDirJNI != null ? JNIUtil.getAbsolutePath(getExternalCacheDirJNI()) : '';
+		
+		if (getExternalCacheDirJNI != null)
+		{
+			final result:Dynamic = getExternalCacheDirJNI();
+			if (result != null) return JNIUtil.getAbsolutePath(result);
+		}
+		
+		return '';
 	}
 
 	/**
@@ -131,17 +181,25 @@ class Context
 	{
 		final getExternalCacheDirsJNI:Null<Dynamic> = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getExternalCacheDirs', '()[Ljava/io/File;');
 
+		final dirs:Array<String> = [];
+		
 		if (getExternalCacheDirsJNI != null)
 		{
-			final dirs:Array<String> = [];
-
-			for (dir in cast(getExternalCacheDirsJNI(), Array<Dynamic>))
-				dirs.push(JNIUtil.getAbsolutePath(dir));
-
-			return dirs;
+			final result:Dynamic = getExternalCacheDirsJNI();
+			if (result != null)
+			{
+				final arr:Array<Dynamic> = cast(result, Array<Dynamic>);
+				if (arr != null)
+				{
+					for (dir in arr)
+					{
+						if (dir != null) dirs.push(JNIUtil.getAbsolutePath(dir));
+					}
+				}
+			}
 		}
-
-		return [];
+		
+		return dirs;
 	}
 
 	/**
@@ -152,7 +210,13 @@ class Context
 	public static function getObbDir():String
 	{
 		final getObbDirJNI = JNICache.createStaticMethod('org.haxe.extension.Tools', 'getObbDir', '()Ljava/io/File;');
-
-		return getObbDirJNI != null ? JNIUtil.getAbsolutePath(getObbDirJNI()) : '';
+		
+		if (getObbDirJNI != null)
+		{
+			final result:Dynamic = getObbDirJNI();
+			if (result != null) return JNIUtil.getAbsolutePath(result);
+		}
+		
+		return '';
 	}
 }
