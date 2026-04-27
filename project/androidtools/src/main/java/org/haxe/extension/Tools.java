@@ -1,5 +1,6 @@
 package org.haxe.extension;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -26,6 +27,8 @@ import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
 import android.widget.Toast;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import java.io.File;
 import java.util.ArrayList;
@@ -355,6 +358,15 @@ public class Tools extends Extension
 			{
 				try
 				{
+					if (Build.VERSION.SDK_INT >= 33)
+					{
+						if (ContextCompat.checkSelfPermission(mainContext, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+						{
+							Log.w(LOG_TAG, "POST_NOTIFICATIONS permission not granted. Skipping notification.");
+							return;
+						}
+					}
+
 					final NotificationManager notificationManager = (NotificationManager) mainContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
 					if (Build.VERSION.SDK_INT >= 26)
