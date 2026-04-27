@@ -17,28 +17,57 @@ import sys.io.Process;
  */
 class Tools
 {
-	public static inline function enableAppSecure():Void
-	{
-		final enableAppSecureJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'enableAppSecure', '()V');
+	// Lazy-loaded JNI methods - don't initialize until first use
+	private static var _enableAppSecureJNI:Null<Dynamic>;
+	private static var _disableAppSecureJNI:Null<Dynamic>;
+	private static var _launchPackageJNI:Null<Dynamic>;
+	private static var _showAlertDialogJNI:Null<Dynamic>;
+	private static var _isDolbyAtmosJNI:Null<Dynamic>;
+	private static var _showNotificationJNI:Null<Dynamic>;
+	private static var _setActivityTitleJNI:Null<Dynamic>;
+	private static var _minimizeWindowJNI:Null<Dynamic>;
+	private static var _isAndroidTVJNI:Null<Dynamic>;
+	private static var _isTabletJNI:Null<Dynamic>;
+	private static var _isChromebookJNI:Null<Dynamic>;
+	private static var _isDeXModeJNI:Null<Dynamic>;
 
-		if (enableAppSecureJNI != null)
-			enableAppSecureJNI();
+	public static function enableAppSecure():Void
+	{
+		try {
+			if (_enableAppSecureJNI == null)
+				_enableAppSecureJNI = JNICache.createStaticMethod('org/haxe/extension/Tools', 'enableAppSecure', '()V');
+
+			if (_enableAppSecureJNI != null)
+				_enableAppSecureJNI();
+		} catch (e:Dynamic) {
+			trace("Error in enableAppSecure: " + e);
+		}
 	}
 
-	public static inline function disableAppSecure():Void
+	public static function disableAppSecure():Void
 	{
-		final disableAppSecureJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'disableAppSecure', '()V');
+		try {
+			if (_disableAppSecureJNI == null)
+				_disableAppSecureJNI = JNICache.createStaticMethod('org/haxe/extension/Tools', 'disableAppSecure', '()V');
 
-		if (disableAppSecureJNI != null)
-			disableAppSecureJNI();
+			if (_disableAppSecureJNI != null)
+				_disableAppSecureJNI();
+		} catch (e:Dynamic) {
+			trace("Error in disableAppSecure: " + e);
+		}
 	}
 
-	public static inline function launchPackage(packageName:String, requestCode:Int = 1):Void
+	public static function launchPackage(packageName:String, requestCode:Int = 1):Void
 	{
-		final launchPackageJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'launchPackage', '(Ljava/lang/String;I)V');
+		try {
+			if (_launchPackageJNI == null)
+				_launchPackageJNI = JNICache.createStaticMethod('org/haxe/extension/Tools', 'launchPackage', '(Ljava/lang/String;I)V');
 
-		if (launchPackageJNI != null)
-			launchPackageJNI(packageName, requestCode);
+			if (_launchPackageJNI != null)
+				_launchPackageJNI(packageName, requestCode);
+		} catch (e:Dynamic) {
+			trace("Error in launchPackage: " + e);
+		}
 	}
 
 	/**
@@ -46,80 +75,144 @@ class Tools
 	 */
 	public static function showAlertDialog(title:String, message:String, ?positiveButton:ButtonData, ?negativeButton:ButtonData):Void
 	{
-		// Default to an "OK" button if no button data is provided
-		if (positiveButton == null)
-			positiveButton = {name: "OK", func: null};
+		try {
+			// Default to an "OK" button if no button data is provided
+			if (positiveButton == null)
+				positiveButton = {name: "OK", func: null};
 
-		if (negativeButton == null)
-			negativeButton = {name: null, func: null};
+			if (negativeButton == null)
+				negativeButton = {name: null, func: null};
 
-		final showAlertDialogJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'showAlertDialog',
-			'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;)V');
+			if (_showAlertDialogJNI == null)
+				_showAlertDialogJNI = JNICache.createStaticMethod('org/haxe/extension/Tools', 'showAlertDialog',
+					'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;)V');
 
-		if (showAlertDialogJNI != null)
-			showAlertDialogJNI(title, message, positiveButton.name, new ButtonListener(positiveButton.func), negativeButton.name,
-				new ButtonListener(negativeButton.func));
+			if (_showAlertDialogJNI != null)
+				_showAlertDialogJNI(title, message, positiveButton.name, new ButtonListener(positiveButton.func), negativeButton.name,
+					new ButtonListener(negativeButton.func));
+		} catch (e:Dynamic) {
+			trace("Error in showAlertDialog: " + e);
+		}
 	}
 
 	#if sys
 	public static function isRooted():Bool
 	{
-		final process:Process = new Process('su');
-		final exitCode:Null<Int> = process.exitCode(true);
-		return exitCode != null && exitCode != 255;
+		try {
+			final process:Process = new Process('su');
+			final exitCode:Null<Int> = process.exitCode(true);
+			return exitCode != null && exitCode != 255;
+		} catch (e:Dynamic) {
+			trace("Error in isRooted: " + e);
+			return false;
+		}
 	}
 	#end
 
-	public static inline function isDolbyAtmos():Bool
+	public static function isDolbyAtmos():Bool
 	{
-		final isDolbyAtmosJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'isDolbyAtmos', '()Z');
-		return isDolbyAtmosJNI != null && isDolbyAtmosJNI();
+		try {
+			if (_isDolbyAtmosJNI == null)
+				_isDolbyAtmosJNI = JNICache.createStaticMethod('org/haxe/extension/Tools', 'isDolbyAtmos', '()Z');
+			
+			return _isDolbyAtmosJNI != null && _isDolbyAtmosJNI();
+		} catch (e:Dynamic) {
+			trace("Error in isDolbyAtmos: " + e);
+			return false;
+		}
 	}
 
-	public static inline function showNotification(title:String, message:String, ?channelID:String = 'unknown_channel',
+	public static function showNotification(title:String, message:String, ?channelID:String = 'unknown_channel',
 			?channelName:String = 'Unknown Channel', ?ID:Int = 1):Void
 	{
-		final showNotificationJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'showNotification',
-			'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
-		if (showNotificationJNI != null)
-			showNotificationJNI(title, message, channelID, channelName, ID);
+		try {
+			if (_showNotificationJNI == null)
+				_showNotificationJNI = JNICache.createStaticMethod('org/haxe/extension/Tools', 'showNotification',
+					'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+			
+			if (_showNotificationJNI != null)
+				_showNotificationJNI(title, message, channelID, channelName, ID);
+		} catch (e:Dynamic) {
+			trace("Error in showNotification: " + e);
+		}
 	}
 
-	public static inline function setActivityTitle(title:String):Bool
+	public static function setActivityTitle(title:String):Bool
 	{
-		final setActivityTitleJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'setActivityTitle', '(Ljava/lang/String;)Z');
-		return setActivityTitleJNI != null && setActivityTitleJNI(title);
+		try {
+			if (_setActivityTitleJNI == null)
+				_setActivityTitleJNI = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'setActivityTitle', '(Ljava/lang/String;)Z');
+			
+			return _setActivityTitleJNI != null && _setActivityTitleJNI(title);
+		} catch (e:Dynamic) {
+			trace("Error in setActivityTitle: " + e);
+			return false;
+		}
 	}
 
-	public static inline function minimizeWindow():Void
+	public static function minimizeWindow():Void
 	{
-		final minimizeWindowJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'minimizeWindow', '()V');
-		if (minimizeWindowJNI != null)
-			minimizeWindowJNI();
+		try {
+			if (_minimizeWindowJNI == null)
+				_minimizeWindowJNI = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'minimizeWindow', '()V');
+			
+			if (_minimizeWindowJNI != null)
+				_minimizeWindowJNI();
+		} catch (e:Dynamic) {
+			trace("Error in minimizeWindow: " + e);
+		}
 	}
 
-	public static inline function isAndroidTV():Bool
+	public static function isAndroidTV():Bool
 	{
-		final isAndroidTVJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isAndroidTV', '()Z');
-		return isAndroidTVJNI != null && isAndroidTVJNI();
+		try {
+			if (_isAndroidTVJNI == null)
+				_isAndroidTVJNI = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isAndroidTV', '()Z');
+			
+			return _isAndroidTVJNI != null && _isAndroidTVJNI();
+		} catch (e:Dynamic) {
+			trace("Error in isAndroidTV: " + e);
+			return false;
+		}
 	}
 
-	public static inline function isTablet():Bool
+	public static function isTablet():Bool
 	{
-		final isTabletJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isTablet', '()Z');
-		return isTabletJNI != null && isTabletJNI();
+		try {
+			if (_isTabletJNI == null)
+				_isTabletJNI = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isTablet', '()Z');
+			
+			return _isTabletJNI != null && _isTabletJNI();
+		} catch (e:Dynamic) {
+			trace("Error in isTablet: " + e);
+			return false;
+		}
 	}
 
-	public static inline function isChromebook():Bool
+	public static function isChromebook():Bool
 	{
-		final isChromebookJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isChromebook', '()Z');
-		return isChromebookJNI != null && isChromebookJNI();
+		try {
+			if (_isChromebookJNI == null)
+				_isChromebookJNI = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isChromebook', '()Z');
+			
+			return _isChromebookJNI != null && _isChromebookJNI();
+		} catch (e:Dynamic) {
+			trace("Error in isChromebook: " + e);
+			return false;
+		}
 	}
 
-	public static inline function isDeXMode():Bool
+	public static function isDeXMode():Bool
 	{
-		final isDeXModeJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isDeXMode', '()Z');
-		return isDeXModeJNI != null && isDeXModeJNI();
+		try {
+			if (_isDeXModeJNI == null)
+				_isDeXModeJNI = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isDeXMode', '()Z');
+			
+			return _isDeXModeJNI != null && _isDeXModeJNI();
+		} catch (e:Dynamic) {
+			trace("Error in isDeXMode: " + e);
+			return false;
+		}
 	}
 }
 
