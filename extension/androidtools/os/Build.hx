@@ -8,11 +8,11 @@ import extension.androidtools.jni.JNICache;
 
 class Build
 {
-	public static var VERSION(get, never):Class<VERSION>;
-	private static inline function get_VERSION() return VERSION;
+	public static var VERSION(get, never):Class<extension.androidtools.os.VERSION>;
+	private static inline function get_VERSION() return extension.androidtools.os.VERSION;
 
-	public static var VERSION_CODES(get, never):Class<VERSION_CODES>;
-	private static inline function get_VERSION_CODES() return VERSION_CODES;
+	public static var VERSION_CODES(get, never):Class<extension.androidtools.os.VERSION_CODES>;
+	private static inline function get_VERSION_CODES() return extension.androidtools.os.VERSION_CODES;
 
 	public static final TAG:String = 'Build';
 	public static final UNKNOWN:String = 'unknown';
@@ -93,7 +93,7 @@ class Build
 
 	private static function get_ODM_SKU():String
 	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
+		if (extension.androidtools.os.VERSION.SDK_INT >= extension.androidtools.os.VERSION_CODES.S)
 		{
 			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'ODM_SKU', 'Ljava/lang/String;');
 			return field != null ? field.get() : '';
@@ -105,7 +105,7 @@ class Build
 
 	private static function get_SKU():String
 	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
+		if (extension.androidtools.os.VERSION.SDK_INT >= extension.androidtools.os.VERSION_CODES.S)
 		{
 			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'SKU', 'Ljava/lang/String;');
 			return field != null ? field.get() : '';
@@ -117,7 +117,7 @@ class Build
 
 	private static function get_SOC_MANUFACTURER():String
 	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
+		if (extension.androidtools.os.VERSION.SDK_INT >= extension.androidtools.os.VERSION_CODES.S)
 		{
 			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'SOC_MANUFACTURER', 'Ljava/lang/String;');
 			return field != null ? field.get() : '';
@@ -129,7 +129,7 @@ class Build
 
 	private static function get_SOC_MODEL():String
 	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
+		if (extension.androidtools.os.VERSION.SDK_INT >= extension.androidtools.os.VERSION_CODES.S)
 		{
 			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'SOC_MODEL', 'Ljava/lang/String;');
 			return field != null ? field.get() : '';
