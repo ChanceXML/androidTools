@@ -14,8 +14,6 @@
 	"contributors": [
 		"MAJigsaw77"
 	],
-	"dependencies": {
-		"hxcpp":"",
-		"lime":""
+	"dependencies": {}
 	}
 }
