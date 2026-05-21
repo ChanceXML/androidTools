@@ -11,13 +11,8 @@ import lime.system.JNI;
 import sys.io.Process;
 #end
 
-/**
- * Provides various utility functions for interacting with Android system features.
- * Includes methods for handling packages, app security, notifications, device features, and more.
- */
 class Tools
 {
-	// Lazy-loaded JNI methods - don't initialize until first use
 	private static var _enableAppSecureJNI:Null<Dynamic>;
 	private static var _disableAppSecureJNI:Null<Dynamic>;
 	private static var _launchPackageJNI:Null<Dynamic>;
@@ -30,6 +25,7 @@ class Tools
 	private static var _isTabletJNI:Null<Dynamic>;
 	private static var _isChromebookJNI:Null<Dynamic>;
 	private static var _isDeXModeJNI:Null<Dynamic>;
+	private static var _pickFileJNI:Null<Dynamic>;
 
 	public static function enableAppSecure():Void
 	{
@@ -70,13 +66,9 @@ class Tools
 		}
 	}
 
-	/**
-	 * Shows an alert dialog with optional positive and negative buttons.
-	 */
 	public static function showAlertDialog(title:String, message:String, ?positiveButton:ButtonData, ?negativeButton:ButtonData):Void
 	{
 		try {
-			// Default to an "OK" button if no button data is provided
 			if (positiveButton == null)
 				positiveButton = {name: "OK", func: null};
 
@@ -214,6 +206,21 @@ class Tools
 			return false;
 		}
 	}
+
+	public static function pickFile(onComplete:String->Void):Void
+	{
+		try {
+			if (_pickFileJNI == null)
+				_pickFileJNI = JNICache.createStaticMethod('org/haxe/extension/Tools', 'pickFile', '(Lorg/haxe/lime/HaxeObject;)V');
+
+			if (_pickFileJNI != null)
+				_pickFileJNI(new FilePickerCallback(onComplete));
+		} catch (e:Dynamic) {
+			trace("Error in pickFile: " + e);
+			if (onComplete != null)
+				onComplete("");
+		}
+	}
 }
 
 @:noCompletion
@@ -242,5 +249,26 @@ private class ButtonListener #if (lime >= "8.0.0") implements JNISafety #end
 	public function onClick():Void
 	{
 		onClickEvent.dispatch();
+	}
+}
+
+@:noCompletion
+private class FilePickerCallback #if (lime >= "8.0.0") implements JNISafety #end
+{
+	private var onPicked:String->Void;
+
+	public function new(callback:String->Void):Void
+	{
+		this.onPicked = callback;
+	}
+
+	@:keep
+	#if (lime >= "8.0.0")
+	@:runOnMainThread
+	#end
+	public function onFilePicked(path:String):Void
+	{
+		if (onPicked != null)
+			onPicked(path);
 	}
 }
