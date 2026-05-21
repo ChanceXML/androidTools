@@ -1,6 +1,7 @@
 package org.haxe.extension;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.MediaCodecList;
@@ -18,6 +20,7 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.util.ArrayMap;
 import android.util.Log;
@@ -31,6 +34,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import java.io.File;
+import java.io.InputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +49,7 @@ public class Tools extends Extension
 	public static final String LOG_TAG = "Tools";
 
 	public static HaxeObject cbObject;
+	private static HaxeObject filePickerCallback = null;
 
 	public static void initCallBack(final HaxeObject cbObject)
 	{
@@ -534,65 +540,68 @@ public class Tools extends Extension
 		return AudioManager.AUDIOFOCUS_REQUEST_FAILED;
 	}
 
-	@Override
-	public boolean onActivityResult(int requestCode, int resultCode, Intent data)
+	public static void pickFile(final HaxeObject callback)
 	{
-		if (cbObject != null)
-		{
-			try
-			{
-				JSONObject content = new JSONObject();
-
-				content.put("requestCode", requestCode);
-				content.put("resultCode", resultCode);
-
-				if (data != null && data.getData() != null)
-					content.put("uri", data.getData().toString());
-
-				cbObject.call("onActivityResult", new Object[]{content.toString()});
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return true;
+		filePickerCallback = callback;
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("*/*");
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		mainActivity.startActivityForResult(intent, 4321);
 	}
 
 	@Override
-	public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+	public boolean onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		if (cbObject != null)
+		if (requestCode == 4321)
 		{
-			try
+			String resultPath = "";
+			if (resultCode == Activity.RESULT_OK && data != null)
 			{
-				JSONObject content = new JSONObject();
+				Uri uri = data.getData();
+				if (uri != null)
+				{
+					try
+					{
+						String fileName = "picked_file";
+						Cursor cursor = mainContext.getContentResolver().query(uri, null, null, null, null);
+						if (cursor != null && cursor.moveToFirst())
+						{
+							int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+							if (index != -1)
+								fileName = cursor.getString(index);
+							cursor.close();
+						}
 
-				content.put("requestCode", requestCode);
-
-				JSONArray permissionsArray = new JSONArray();
-
-				for (String permission : permissions)
-					permissionsArray.put(permission);
-
-				content.put("permissions", permissionsArray);
-				
-				JSONArray grantResultsArray = new JSONArray();
-
-				for (int result : grantResults)
-					grantResultsArray.put(result);
-
-				content.put("grantResults", grantResultsArray);
-
-				cbObject.call("onRequestPermissionsResult", new Object[]{content.toString()});
+						File file = new File(mainContext.getCacheDir(), fileName);
+						InputStream inputStream = mainContext.getContentResolver().openInputStream(uri);
+						FileOutputStream outputStream = new FileOutputStream(file);
+						
+						byte[] buffer = new byte[1024];
+						int length;
+						while ((length = inputStream.read(buffer)) > 0)
+						{
+							outputStream.write(buffer, 0, length);
+						}
+						
+						outputStream.close();
+						inputStream.close();
+						resultPath = file.getAbsolutePath();
+					}
+					catch (Exception e)
+					{
+						Log.e(LOG_TAG, e.toString());
+					}
+				}
 			}
-			catch (Exception e)
+
+			if (filePickerCallback != null)
 			{
-				e.printStackTrace();
+				filePickerCallback.call("onFilePicked", new Object[] { resultPath });
+				filePickerCallback = null;
 			}
+			return true;
 		}
 
-		return true;
+		return super.onActivityResult(requestCode, resultCode, data);
 	}
 }
